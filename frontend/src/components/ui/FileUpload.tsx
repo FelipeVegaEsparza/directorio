@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useRef } from 'react';
 import { apiClient } from '@/lib/api';
 import Button from './Button';

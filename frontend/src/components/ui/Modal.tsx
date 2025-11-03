@@ -1,3 +1,4 @@
+'use client';
 import React, { useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { cn } from '@/utils';
