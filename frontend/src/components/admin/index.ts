@@ -1,8 +1,8 @@
 export { AdminLayout } from './AdminLayout';
 export { AdminLayoutWithTopNav } from './AdminLayoutWithTopNav';
 export { AdminTopNav } from './AdminTopNav';
-export { default as AuthGuard } from './AuthGuard';
-export { default as AnalyticsDashboard } from './AnalyticsDashboard';
+export * from './AuthGuard';
+export * from './AnalyticsDashboard';
 
 // Dashboard components
 export * from './dashboard';
