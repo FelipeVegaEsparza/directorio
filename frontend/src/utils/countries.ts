@@ -1,0 +1,52 @@
+export const COUNTRIES = [
+  'Argentina',
+  'Bolivia',
+  'Brasil',
+  'Chile',
+  'Colombia',
+  'Costa Rica',
+  'Cuba',
+  'Ecuador',
+  'El Salvador',
+  'España',
+  'Estados Unidos',
+  'Guatemala',
+  'Honduras',
+  'México',
+  'Nicaragua',
+  'Panamá',
+  'Paraguay',
+  'Perú',
+  'Puerto Rico',
+  'República Dominicana',
+  'Uruguay',
+  'Venezuela',
+  // Otros países importantes
+  'Alemania',
+  'Francia',
+  'Italia',
+  'Reino Unido',
+  'Canadá',
+  'Australia',
+  'Japón',
+  'Corea del Sur',
+  'China',
+  'India',
+  'Rusia',
+  'Portugal',
+  'Países Bajos',
+  'Bélgica',
+  'Suiza',
+  'Austria',
+  'Suecia',
+  'Noruega',
+  'Dinamarca',
+  'Finlandia',
+].sort(); // Ordenar alfabéticamente
+
+export const getCountryOptions = () => {
+  return COUNTRIES.map(country => ({
+    value: country,
+    label: country
+  }));
+};
