@@ -30,7 +30,7 @@ export function RequestFilters({ filters, onFiltersChange, loading }: RequestFil
     const value = e.target.value;
     setLocalFilters(prev => ({
       ...prev,
-      status: value || undefined
+      status: value
     }));
   };
 
@@ -41,7 +41,8 @@ export function RequestFilters({ filters, onFiltersChange, loading }: RequestFil
   const handleClearFilters = () => {
     const clearedFilters = {
       page: 1,
-      limit: filters.limit || 20
+      limit: filters.limit || 20,
+      status: ''
     };
     setLocalFilters(clearedFilters);
     onFiltersChange(clearedFilters);
