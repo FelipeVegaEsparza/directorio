@@ -44,6 +44,11 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// Simple root endpoint for default health checks
+app.get('/', (_req, res) => {
+  res.status(200).json({ status: 'OK' });
+});
+
 // API routes
 app.use(routes);
 
