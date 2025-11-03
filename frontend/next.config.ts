@@ -15,7 +15,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   reactStrictMode: true,
-  swcMinify: true,
   experimental: {
     optimizePackageImports: ['@heroicons/react'],
   },
