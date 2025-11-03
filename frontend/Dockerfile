@@ -26,4 +26,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD curl 
 EXPOSE 3000
 
 # Command to run the application
-CMD [ "node", "server.js" ]
+CMD [ "node", "server.js", "-p", "3000" ]
