@@ -6,21 +6,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { syncDatabase } from './database/sync';
 import { seedDemoData } from './database/seeders/demo-data';
-import routes from './routes';
-import { errorHandler } from './middleware/errorHandler';
-
-// Load environment variables
-dotenv.config();
-
-const app = express();
-const PORT = process.env.PORT || 3001;
-
-// Middleware
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
 app.use(morgan('combined'));
@@ -37,10 +23,10 @@ app.use('/uploads', (req, res, next) => {
 
 // Health check endpoint
 app.get('/health', (_req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV 
+    environment: process.env.NODE_ENV
   });
 });
 
@@ -49,7 +35,7 @@ app.use(routes);
 
 // API info endpoint
 app.get('/api', (_req, res) => {
-  res.json({ 
+  res.json({
     message: 'Radio & TV Directory API',
     version: '1.0.0',
     endpoints: {
@@ -75,10 +61,10 @@ async function startServer() {
   try {
     // Sync database on startup
     await syncDatabase();
-    
+
     // Note: Demo data seeding is disabled by default
     // Run 'npm run db:seed' manually if you need sample data
-    
+
     // Start server
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
