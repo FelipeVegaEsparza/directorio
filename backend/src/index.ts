@@ -6,7 +6,24 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { syncDatabase } from './database/sync';
 import { seedDemoData } from './database/seeders/demo-data';
-origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+import routes from './routes';
+import { errorHandler } from './middleware/errorHandler';
+
+// Load environment variables
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+// Trust proxy for Easypanel/Docker
+app.set('trust proxy', 1);
+
+// Middleware
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
 app.use(morgan('combined'));
@@ -14,7 +31,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static files for uploads with CORS headers
-app.use('/uploads', (req, res, next) => {
+app.use('/uploads', (req: express.Request, res: express.Response, next: express.NextFunction) => {
   res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:3000');
   res.header('Access-Control-Allow-Methods', 'GET');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -22,7 +39,7 @@ app.use('/uploads', (req, res, next) => {
 }, express.static(path.join(__dirname, '../uploads')));
 
 // Health check endpoint
-app.get('/health', (_req, res) => {
+app.get('/health', (_req: express.Request, res: express.Response) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
@@ -34,7 +51,7 @@ app.get('/health', (_req, res) => {
 app.use(routes);
 
 // API info endpoint
-app.get('/api', (_req, res) => {
+app.get('/api', (_req: express.Request, res: express.Response) => {
   res.json({
     message: 'Radio & TV Directory API',
     version: '1.0.0',
@@ -52,7 +69,7 @@ app.get('/api', (_req, res) => {
 app.use(errorHandler);
 
 // 404 handler
-app.use((_req, res) => {
+app.use((_req: express.Request, res: express.Response) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
