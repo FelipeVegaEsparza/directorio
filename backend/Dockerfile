@@ -9,6 +9,7 @@ RUN npm run build
 # Etapa 2: Crear la imagen final de producción
 FROM node:20-slim
 WORKDIR /app
+ENV NODE_ENV=production
 
 # Instalar curl para los health checks
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*

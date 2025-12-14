@@ -5,6 +5,14 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
 
+console.log('🔌 Database Config:', {
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  db: process.env.DB_NAME,
+  node_env: process.env.NODE_ENV
+});
+
 const sequelize = new Sequelize({
   dialect: 'mysql',
   host: process.env.DB_HOST || 'localhost',
