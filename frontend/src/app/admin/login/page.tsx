@@ -36,59 +36,84 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Panel de Administración
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-secondary-900 to-primary-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-primary-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-accent-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      <div className="max-w-md w-full space-y-8 relative z-10">
+        <div className="flex flex-col items-center">
+          <img
+            src="/images/logo.png"
+            alt="Hostreams"
+            className="h-16 w-auto mb-8 drop-shadow-lg"
+          />
+          <h2 className="text-center text-3xl font-bold text-white tracking-tight">
+            Bienvenido de nuevo
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Inicia sesión para acceder al panel administrativo
+          <p className="mt-2 text-center text-sm text-gray-400">
+            Ingresa tus credenciales para acceder al panel
           </p>
         </div>
 
-        <Card className="mt-8 space-y-6" padding="lg">
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+              <div className="bg-red-500/10 border border-red-500/20 text-red-200 px-4 py-3 rounded-lg text-sm text-center">
                 {error}
               </div>
             )}
 
-            <div className="space-y-4">
-              <Input
-                label="Usuario"
-                type="text"
-                value={credentials.username}
-                onChange={handleInputChange('username')}
-                placeholder="Ingresa tu usuario"
-                required
-                disabled={loading}
-              />
+            <div className="space-y-5">
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-300 ml-1">Usuario</label>
+                <div className="relative">
+                  <Input
+                    type="text"
+                    value={credentials.username}
+                    onChange={handleInputChange('username')}
+                    placeholder="ej. admin"
+                    required
+                    disabled={loading}
+                    className="bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500/50"
+                  />
+                </div>
+              </div>
 
-              <Input
-                label="Contraseña"
-                type="password"
-                value={credentials.password}
-                onChange={handleInputChange('password')}
-                placeholder="Ingresa tu contraseña"
-                required
-                disabled={loading}
-              />
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-300 ml-1">Contraseña</label>
+                <div className="relative">
+                  <Input
+                    type="password"
+                    value={credentials.password}
+                    onChange={handleInputChange('password')}
+                    placeholder="••••••••"
+                    required
+                    disabled={loading}
+                    className="bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500/50"
+                  />
+                </div>
+              </div>
             </div>
 
             <Button
               type="submit"
               variant="primary"
               size="lg"
-              className="w-full"
+              className="w-full bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 border-0 shadow-lg shadow-primary-500/20 py-3 text-lg font-semibold"
               loading={loading}
               disabled={loading || !credentials.username || !credentials.password}
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              {loading ? 'Iniciando sesión...' : 'Ingresar al Panel'}
             </Button>
           </form>
-        </Card>
+        </div>
+
+        <p className="text-center text-xs text-gray-500">
+          © {new Date().getFullYear()} Hostreams. Todos los derechos reservados.
+        </p>
       </div>
     </div>
   );

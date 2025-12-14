@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  PlayIcon, 
-  PauseIcon, 
-  SpeakerWaveIcon, 
+import {
+  PlayIcon,
+  PauseIcon,
+  SpeakerWaveIcon,
   SpeakerXMarkIcon,
-  ExclamationTriangleIcon 
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/solid';
 import { cn, formatDuration } from '@/utils';
 import { PlayerProps, PlayerState } from '@/types';
@@ -14,12 +14,18 @@ import { Card, Button, Loading, CountryFlag } from '@/components/ui';
 import { apiClient } from '@/lib/api';
 import Hls from 'hls.js';
 
-const MediaPlayer: React.FC<PlayerProps> = ({
+// Extend PlayerProps locally to avoid modifying global types if not needed immediately
+interface ExtendedPlayerProps extends PlayerProps {
+  minimal?: boolean;
+}
+
+const MediaPlayer: React.FC<ExtendedPlayerProps> = ({
   media,
   autoplay = false,
   onPlay,
   onPause,
   onError,
+  minimal = false,
 }) => {
   const [hasTrackedPlay, setHasTrackedPlay] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -73,7 +79,7 @@ const MediaPlayer: React.FC<PlayerProps> = ({
 
     const handleError = (event: any) => {
       let errorMessage = 'Error al cargar el stream. ';
-      
+
       if (mediaElement?.error) {
         switch (mediaElement.error.code) {
           case MediaError.MEDIA_ERR_ABORTED:
@@ -94,12 +100,12 @@ const MediaPlayer: React.FC<PlayerProps> = ({
       } else {
         errorMessage += 'Verifica la URL o intenta más tarde.';
       }
-      
-      setPlayerState(prev => ({ 
-        ...prev, 
-        loading: false, 
+
+      setPlayerState(prev => ({
+        ...prev,
+        loading: false,
         error: errorMessage,
-        isPlaying: false 
+        isPlaying: false
       }));
       if (onError) {
         onError(errorMessage);
@@ -126,20 +132,20 @@ const MediaPlayer: React.FC<PlayerProps> = ({
             xhr.withCredentials = false;
           }
         });
-        
+
         hlsRef.current = hls;
-        
+
         hls.on(Hls.Events.MEDIA_ATTACHED, () => {
           hls.loadSource(media.streamUrl);
         });
-        
+
         hls.on(Hls.Events.MANIFEST_LOADING, () => {
           setPlayerState(prev => ({ ...prev, loading: true, error: undefined }));
         });
-        
+
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           setPlayerState(prev => ({ ...prev, loading: false }));
-          
+
           // If autoplay was requested, start playing now that manifest is ready
           if (autoplay && !hasAutoPlayed.current) {
             hasAutoPlayed.current = true;
@@ -148,11 +154,11 @@ const MediaPlayer: React.FC<PlayerProps> = ({
             }, 100);
           }
         });
-        
+
         hls.on(Hls.Events.ERROR, (event, data) => {
           if (data.fatal) {
             let errorMessage = 'Error al cargar el stream HLS: ';
-            
+
             switch (data.type) {
               case Hls.ErrorTypes.NETWORK_ERROR:
                 errorMessage += `Error de red (${data.details}). `;
@@ -164,38 +170,38 @@ const MediaPlayer: React.FC<PlayerProps> = ({
                 // Try to recover
                 hls.startLoad();
                 return;
-                
+
               case Hls.ErrorTypes.MEDIA_ERROR:
                 errorMessage += `Error de media (${data.details}). Intentando recuperar...`;
                 hls.recoverMediaError();
                 return;
-                
+
               default:
                 errorMessage += `Error fatal (${data.type}: ${data.details}).`;
                 break;
             }
-            
-            setPlayerState(prev => ({ 
-              ...prev, 
-              loading: false, 
+
+            setPlayerState(prev => ({
+              ...prev,
+              loading: false,
               error: errorMessage,
-              isPlaying: false 
+              isPlaying: false
             }));
             if (onError) onError(errorMessage);
           }
         });
-        
+
         hls.attachMedia(mediaElement);
-        
+
       } else if (mediaElement.canPlayType && mediaElement.canPlayType('application/vnd.apple.mpegurl')) {
         // Safari native HLS support
         mediaElement.src = media.streamUrl;
       } else {
-        setPlayerState(prev => ({ 
-          ...prev, 
-          loading: false, 
+        setPlayerState(prev => ({
+          ...prev,
+          loading: false,
           error: 'Tu navegador no soporta streams HLS (.m3u8). Intenta con Chrome, Firefox o Safari.',
-          isPlaying: false 
+          isPlaying: false
         }));
       }
     } else {
@@ -215,7 +221,7 @@ const MediaPlayer: React.FC<PlayerProps> = ({
       mediaElement.removeEventListener('timeupdate', handleTimeUpdate);
       mediaElement.removeEventListener('error', handleError);
       mediaElement.removeEventListener('ended', handleEnded);
-      
+
       // Cleanup HLS
       if (hlsRef.current) {
         hlsRef.current.destroy();
@@ -243,11 +249,11 @@ const MediaPlayer: React.FC<PlayerProps> = ({
 
     try {
       setPlayerState(prev => ({ ...prev, loading: true, error: undefined }));
-      
+
       // For HLS streams, check if manifest is loaded
       if (isHLS && hlsRef.current) {
         const hls = hlsRef.current;
-        
+
         // If manifest is not loaded yet, wait for it
         if (hls.levels.length === 0) {
           // Wait for manifest to be parsed
@@ -255,14 +261,14 @@ const MediaPlayer: React.FC<PlayerProps> = ({
             const timeout = setTimeout(() => {
               reject(new Error('Timeout esperando el manifest HLS'));
             }, 10000);
-            
+
             const onManifestParsed = () => {
               clearTimeout(timeout);
               hls.off(Hls.Events.MANIFEST_PARSED, onManifestParsed);
               hls.off(Hls.Events.ERROR, onError);
               resolve();
             };
-            
+
             const onError = (event: any, data: any) => {
               if (data.fatal) {
                 clearTimeout(timeout);
@@ -271,20 +277,20 @@ const MediaPlayer: React.FC<PlayerProps> = ({
                 reject(new Error(`Error HLS: ${data.details}`));
               }
             };
-            
+
             hls.on(Hls.Events.MANIFEST_PARSED, onManifestParsed);
             hls.on(Hls.Events.ERROR, onError);
           });
-          
+
           await waitForManifest;
         }
       } else if (!isHLS) {
         mediaElement.load();
       }
-      
+
       await mediaElement.play();
       setPlayerState(prev => ({ ...prev, isPlaying: true, loading: false }));
-      
+
       // Track play event only once per session
       if (!hasTrackedPlay) {
         try {
@@ -296,15 +302,15 @@ const MediaPlayer: React.FC<PlayerProps> = ({
           // Silently fail stats tracking
         }
       }
-      
+
       if (onPlay) onPlay();
     } catch (error) {
       const errorMessage = `No se pudo reproducir el stream: ${error instanceof Error ? error.message : 'Error desconocido'}`;
-      setPlayerState(prev => ({ 
-        ...prev, 
-        loading: false, 
+      setPlayerState(prev => ({
+        ...prev,
+        loading: false,
         error: errorMessage,
-        isPlaying: false 
+        isPlaying: false
       }));
       if (onError) onError(errorMessage);
     }
@@ -324,10 +330,10 @@ const MediaPlayer: React.FC<PlayerProps> = ({
     if (!mediaElement) return;
 
     mediaElement.volume = newVolume;
-    setPlayerState(prev => ({ 
-      ...prev, 
+    setPlayerState(prev => ({
+      ...prev,
       volume: newVolume,
-      muted: newVolume === 0 
+      muted: newVolume === 0
     }));
   };
 
@@ -348,10 +354,10 @@ const MediaPlayer: React.FC<PlayerProps> = ({
     setPlayerState(prev => ({ ...prev, currentTime: newTime }));
   };
 
-  return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <div className="space-y-4">
-        {/* Media Info */}
+  const content = (
+    <div className={cn("space-y-4", minimal ? "w-full h-full space-y-0" : "")}>
+      {/* Media Info - Hide in minimal mode */}
+      {!minimal && (
         <div className="flex items-center space-x-4">
           {media.logoUrl && (
             <img
@@ -376,63 +382,68 @@ const MediaPlayer: React.FC<PlayerProps> = ({
             </div>
           </div>
         </div>
+      )}
 
-        {/* Video Player (for TV) */}
-        {isVideo && (
-          <div className="relative bg-black rounded-xl overflow-hidden aspect-video">
-            <video
-              ref={videoRef}
-              {...(!isHLS && { src: media.streamUrl })}
-              className="w-full h-full"
-              controls={playerState.isPlaying}
-              playsInline
-              muted={playerState.muted}
-              crossOrigin="anonymous"
-            />
-            {!playerState.isPlaying && !playerState.loading && !playerState.error && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                <Button
-                  onClick={handlePlay}
-                  size="lg"
-                  className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-                  disabled={isHLS && hlsRef.current?.levels.length === 0}
-                >
-                  <PlayIcon className="w-8 h-8" />
-                </Button>
-              </div>
-            )}
-            
-            {/* HLS Loading Indicator */}
-            {isHLS && hlsRef.current?.levels.length === 0 && !playerState.error && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/70">
-                <div className="text-center text-white">
-                  <Loading size="md" />
-                  <p className="mt-2 text-sm">Cargando stream...</p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Audio Player (for Radio) */}
-        {!isVideo && (
-          <audio
-            ref={audioRef}
+      {/* Video Player (for TV) */}
+      {isVideo && (
+        <div className={cn(
+          "relative bg-black overflow-hidden",
+          minimal ? "w-full h-full" : "rounded-xl aspect-video"
+        )}>
+          <video
+            ref={videoRef}
             {...(!isHLS && { src: media.streamUrl })}
-            preload="metadata"
+            className="w-full h-full object-contain"
+            controls={minimal ? true : playerState.isPlaying}
+            playsInline
+            muted={playerState.muted}
             crossOrigin="anonymous"
           />
-        )}
+          {!playerState.isPlaying && !playerState.loading && !playerState.error && !minimal && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+              <Button
+                onClick={handlePlay}
+                size="lg"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                disabled={isHLS && hlsRef.current?.levels.length === 0}
+              >
+                <PlayIcon className="w-8 h-8" />
+              </Button>
+            </div>
+          )}
 
-        {/* Error State */}
-        {playerState.error && (
-          <div className="flex items-center space-x-3 p-4 bg-error-50 border border-error-200 rounded-xl">
-            <ExclamationTriangleIcon className="w-5 h-5 text-error-500 flex-shrink-0" />
-            <p className="text-error-700 text-sm">{playerState.error}</p>
-          </div>
-        )}
+          {/* HLS Loading Indicator */}
+          {isHLS && hlsRef.current?.levels.length === 0 && !playerState.error && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+              <div className="text-center text-white">
+                <Loading size="md" />
+                <p className="mt-2 text-sm">Cargando stream...</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
-        {/* Controls */}
+      {/* Audio Player (for Radio) */}
+      {!isVideo && (
+        <audio
+          ref={audioRef}
+          {...(!isHLS && { src: media.streamUrl })}
+          preload="metadata"
+          crossOrigin="anonymous"
+        />
+      )}
+
+      {/* Error State */}
+      {playerState.error && (
+        <div className="flex items-center space-x-3 p-4 bg-error-50 border border-error-200 rounded-xl">
+          <ExclamationTriangleIcon className="w-5 h-5 text-error-500 flex-shrink-0" />
+          <p className="text-error-700 text-sm">{playerState.error}</p>
+        </div>
+      )}
+
+      {/* Controls - Hide in minimal mode */}
+      {!minimal && (
         <div className="space-y-4">
           {/* Main Controls */}
           <div className="flex items-center justify-center space-x-4">
@@ -503,18 +514,27 @@ const MediaPlayer: React.FC<PlayerProps> = ({
             </div>
           </div>
         </div>
+      )}
 
-        {/* Live Indicator */}
-        {playerState.isPlaying && (
-          <div className="flex items-center justify-center">
-            <div className="flex items-center space-x-2 px-3 py-1 bg-error-100 text-error-700 rounded-full text-sm">
-              <div className="w-2 h-2 bg-error-500 rounded-full animate-pulse"></div>
-              <span className="font-medium">EN VIVO</span>
-            </div>
+      {/* Live Indicator - Hide in minimal mode */}
+      {!minimal && playerState.isPlaying && (
+        <div className="flex items-center justify-center">
+          <div className="flex items-center space-x-2 px-3 py-1 bg-error-100 text-error-700 rounded-full text-sm">
+            <div className="w-2 h-2 bg-error-500 rounded-full animate-pulse"></div>
+            <span className="font-medium">EN VIVO</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+    </div>
+  );
 
+  if (minimal) {
+    return content;
+  }
+
+  return (
+    <Card className="w-full max-w-2xl mx-auto">
+      {content}
       <style jsx>{`
         .slider::-webkit-slider-thumb {
           appearance: none;

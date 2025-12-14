@@ -28,6 +28,7 @@ const Button: React.FC<ButtonProps> = ({
     sm: 'px-3 py-2 text-sm',
     md: 'px-4 py-2.5 text-base',
     lg: 'px-6 py-3 text-lg',
+    xl: 'px-8 py-4 text-xl font-bold',
   };
 
   const handleClick = () => {

@@ -32,16 +32,15 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">📻</span>
-              </div>
-              <span className="font-display font-bold text-xl">
-                RadioTV Directory
-              </span>
+            <div className="mb-6">
+              <img
+                src="/images/logo.png"
+                alt="Hostreams"
+                className="h-12 w-auto"
+              />
             </div>
             <p className="text-secondary-300 mb-6 max-w-md">
-              El directorio más completo de radios y canales de TV online. 
+              El directorio más completo de radios y canales de TV online.
               Descubre y disfruta de contenido de calidad desde cualquier lugar.
             </p>
             <div className="flex space-x-4">
@@ -96,7 +95,7 @@ const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="border-t border-secondary-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-secondary-400 text-sm">
-            © {currentYear} RadioTV Directory. Todos los derechos reservados.
+            © {currentYear} Hostreams. Todos los derechos reservados.
           </p>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
             <span className="text-secondary-400 text-sm">Desarrollado por</span>

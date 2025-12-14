@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -12,17 +12,25 @@ import {
   TvIcon,
   GlobeAltIcon,
   UserPlusIcon,
-  CogIcon
+  RocketLaunchIcon
 } from '@heroicons/react/24/outline';
 import { cn } from '@/utils';
-import { Button } from '@/components/ui';
 import { useSiteConfig } from '@/hooks/useSiteConfig';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { config } = useSiteConfig();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navigation = [
     { name: 'Inicio', href: '/', icon: HomeIcon },
@@ -44,126 +52,77 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white shadow-soft sticky top-0 z-40">
-      {/* Enhanced ipstream.cl branding banner with animations */}
-      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b border-blue-100 overflow-hidden relative">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-0 left-0 w-32 h-32 bg-blue-200 rounded-full -translate-x-16 -translate-y-16 animate-pulse"></div>
-          <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-200 rounded-full translate-x-12 -translate-y-12 animate-pulse delay-1000"></div>
-        </div>
-
-        <div className="container-wide relative">
-          <div className="flex items-center justify-center py-3 px-4 min-h-[44px]">
-            <div className="text-center animate-fade-in">
-              <div className="flex items-center justify-center space-x-2">
-                <span className="text-lg animate-bounce">⚡</span>
-                <span className="text-sm text-slate-700 hidden sm:inline">Tecnología de streaming profesional por</span>
-                <a
-                  href="https://ipstream.cl"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-semibold text-blue-700 hover:text-blue-800 transition-all duration-300 hover:scale-105 underline decoration-blue-300 hover:decoration-blue-500 decoration-2"
-                >
-                  ipstream.cl
-                </a>
-                <span className="text-xs text-slate-500 hidden md:inline ml-2 animate-pulse">
-                  ¿Necesitas tu plataforma?
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <header
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        scrolled
+          ? "bg-white/90 backdrop-blur-md shadow-md py-2"
+          : "bg-white shadow-sm py-4"
+      )}
+    >
       <div className="container-wide">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center">
           {/* Logo */}
-          <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center space-x-3">
-              {config.logoUrl ? (
-                <img
-                  src={config.logoUrl}
-                  alt={config.siteName}
-                  className="h-8 w-auto"
-                  onError={(e) => {
-                    // Si falla la imagen, mostrar el logo por defecto
-                    e.currentTarget.style.display = 'none';
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (fallback) fallback.style.display = 'flex';
-                  }}
-                />
-              ) : null}
-              <div
+          <div className="flex-shrink-0 transition-transform duration-300 hover:scale-105">
+            <Link href="/" className="flex items-center">
+              <img
+                src="/images/logo.png"
+                alt="Hostreams"
                 className={cn(
-                  "w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center",
-                  config.logoUrl ? "hidden" : "flex"
+                  "w-auto transition-all duration-300",
+                  scrolled ? "h-10" : "h-12"
                 )}
-                style={{ display: config.logoUrl ? 'none' : 'flex' }}
-              >
-                <span className="text-white font-bold text-lg">📻</span>
-              </div>
-              {!config.showOnlyLogo && (
-                <span className="font-display font-bold text-xl text-secondary-900">
-                  {config.siteName}
-                </span>
-              )}
+              />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="desktop-nav flex items-center space-x-6">
+          <nav className="hidden md:flex items-center space-x-1">
             {navigation.map((item) => {
               const IconComponent = item.icon;
+              const active = isActive(item.href);
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                    isActive(item.href)
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100'
+                    'flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200',
+                    active
+                      ? 'bg-primary-50 text-primary-600 shadow-sm'
+                      : 'text-gray-600 hover:text-primary-600 hover:bg-gray-50'
                   )}
                 >
-                  <IconComponent className="w-4 h-4" />
+                  <IconComponent className={cn("w-4 h-4", active && "stroke-2")} />
                   <span>{item.name}</span>
                 </Link>
               );
             })}
           </nav>
 
-          {/* Search, Streaming CTA and Admin */}
-          <div className="desktop-actions flex items-center space-x-4">
+          {/* Search & CTA */}
+          <div className="hidden md:flex items-center space-x-3">
             <button
               onClick={() => router.push('/buscar')}
-              className="p-2 text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100 rounded-lg transition-colors"
+              className="p-2.5 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-full transition-all duration-200"
               title="Buscar"
             >
               <MagnifyingGlassIcon className="h-5 w-5" />
             </button>
 
-            {/* Subtle CTA for ipstream.cl */}
             <button
               onClick={handleIpstreamClick}
-              className="hidden lg:flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-full hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
-              title="¿Necesitas tu propia plataforma de streaming?"
+              className="group relative inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-600 to-accent-600 text-white text-sm font-semibold rounded-full hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-300 hover:-translate-y-0.5"
             >
-              <span>🚀</span>
-              <span>¿Tu streaming?</span>
+              <RocketLaunchIcon className="w-4 h-4 group-hover:animate-pulse" />
+              <span>Planes de Streaming</span>
             </button>
-
-            <Link href="/admin">
-              <Button variant="outline" size="sm">
-                Admin
-              </Button>
-            </Link>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-lg text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100 transition-colors"
+              className="p-2 rounded-lg text-gray-600 hover:text-primary-600 hover:bg-gray-50 transition-colors"
             >
               <span className="sr-only">Abrir menú</span>
               {isMenuOpen ? (
@@ -177,19 +136,20 @@ const Header: React.FC = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 border-t border-secondary-200">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-100 shadow-lg animate-fade-in-down">
+            <div className="p-4 space-y-2">
               {navigation.map((item) => {
                 const IconComponent = item.icon;
+                const active = isActive(item.href);
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      'flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium transition-colors',
-                      isActive(item.href)
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100'
+                      'flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium transition-colors',
+                      active
+                        ? 'bg-primary-50 text-primary-600'
+                        : 'text-gray-600 hover:text-primary-600 hover:bg-gray-50'
                     )}
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -198,38 +158,29 @@ const Header: React.FC = () => {
                   </Link>
                 );
               })}
-              <div className="pt-4 border-t border-secondary-200 space-y-1">
+
+              <div className="pt-4 mt-2 border-t border-gray-100 space-y-3">
                 <button
                   onClick={() => {
                     router.push('/buscar');
                     setIsMenuOpen(false);
                   }}
-                  className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 transition-colors w-full text-left"
+                  className="flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 transition-colors w-full text-left"
                 >
                   <MagnifyingGlassIcon className="w-5 h-5" />
                   <span>Buscar</span>
                 </button>
 
-                {/* Mobile CTA for ipstream.cl */}
                 <button
                   onClick={() => {
                     handleIpstreamClick();
                     setIsMenuOpen(false);
                   }}
-                  className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all w-full text-left"
+                  className="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl font-semibold shadow-lg shadow-primary-500/20"
                 >
-                  <span className="text-lg">🚀</span>
-                  <span>¿Necesitas tu streaming?</span>
+                  <RocketLaunchIcon className="w-5 h-5" />
+                  <span>Planes de Streaming</span>
                 </button>
-
-                <Link
-                  href="/admin"
-                  className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <CogIcon className="w-5 h-5" />
-                  <span>Admin</span>
-                </Link>
               </div>
             </div>
           </div>

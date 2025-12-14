@@ -16,6 +16,8 @@ interface MediaSectionProps {
   error?: string | null;
   viewAllLink?: string;
   onMediaPlay?: (media: Media) => void;
+  playingInstanceId?: string | null;
+  sectionId?: string;
   className?: string;
   columns?: 2 | 3 | 4 | 6;
 }
@@ -28,6 +30,8 @@ const MediaSection: React.FC<MediaSectionProps> = ({
   error,
   viewAllLink,
   onMediaPlay,
+  playingInstanceId,
+  sectionId = 'default',
   className,
   columns = 3,
 }) => {
@@ -158,6 +162,7 @@ const MediaSection: React.FC<MediaSectionProps> = ({
               key={item.id}
               media={item}
               onPlay={onMediaPlay}
+              isPlaying={playingInstanceId === `${sectionId}-${item.id}`}
               className="animate-fade-in"
             />
           ))}
