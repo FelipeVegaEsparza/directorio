@@ -40,143 +40,114 @@ export function FileUpload({
     }
 
     setError(null);
-    setUploading(true);
+    errorMessage = 'Endpoint de upload no encontrado. Verifica que el backend esté ejecutándose.';
+  } else if (err.response.status === 401) {
+    errorMessage = 'No autorizado. Por favor, inicia sesión nuevamente.';
+  } else if (err.response.status === 413) {
+    errorMessage = `Archivo demasiado grande. Máximo ${maxSize}MB.`;
+  } else if (err.response.data?.message) {
+    errorMessage = err.response.data.message;
+  }
+} else if (err.request) {
+  errorMessage = 'No se pudo conectar con el servidor.';
+} else if (err.message) {
+  errorMessage = err.message;
+}
 
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await apiClient.post<{ data: { url: string } }>('/api/admin/upload/single', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      if (response.success) {
-        // Try different possible response structures
-        const url = response.data?.data?.url || response.data?.url || response.url;
-
-        if (url) {
-          onUpload(url);
-        } else {
-          throw new Error('No se pudo obtener la URL del archivo subido');
-        }
-      } else {
-        throw new Error(response.message || 'Error al subir archivo');
-      }
-    } catch (err: any) {
-      let errorMessage = 'Error al subir archivo';
-
-      if (err.response) {
-        if (err.response.status === 404) {
-          errorMessage = 'Endpoint de upload no encontrado. Verifica que el backend esté ejecutándose.';
-        } else if (err.response.status === 401) {
-          errorMessage = 'No autorizado. Por favor, inicia sesión nuevamente.';
-        } else if (err.response.status === 413) {
-          errorMessage = `Archivo demasiado grande. Máximo ${maxSize}MB.`;
-        } else if (err.response.data?.message) {
-          errorMessage = err.response.data.message;
-        }
-      } else if (err.request) {
-        errorMessage = 'No se pudo conectar con el servidor.';
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-
-      setError(errorMessage);
+setError(errorMessage);
     } finally {
-      setUploading(false);
-      // Clear the input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
+  setUploading(false);
+  // Clear the input
+  if (fileInputRef.current) {
+    fileInputRef.current.value = '';
+  }
+}
   };
 
-  const handleRemove = () => {
-    onUpload('');
-  };
+const handleRemove = () => {
+  onUpload('');
+};
 
-  const handleClick = () => {
-    fileInputRef.current?.click();
-  };
+const handleClick = () => {
+  fileInputRef.current?.click();
+};
 
-  const getImageUrl = (url?: string) => {
-    if (!url) return undefined;
+const getImageUrl = (url?: string) => {
+  if (!url) return undefined;
 
-    // Fix for legacy localhost URLs
-    if (url.includes('localhost:3001')) {
-      const relativePath = url.split('localhost:3001')[1];
-      return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${relativePath}`;
-    }
+  // Fix for legacy localhost URLs
+  if (url.includes('localhost:3001')) {
+    const relativePath = url.split('localhost:3001')[1];
+    return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${relativePath}`;
+  }
 
-    // Handle relative paths
-    if (url.startsWith('/')) {
-      return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${url}`;
-    }
+  // Handle relative paths
+  if (url.startsWith('/')) {
+    return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${url}`;
+  }
 
-    return url;
-  };
+  return url;
+};
 
-  return (
-    <div className="space-y-2">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={accept}
-        onChange={handleFileSelect}
-        disabled={disabled || uploading}
-        className="hidden"
-      />
+return (
+  <div className="space-y-2">
+    <input
+      ref={fileInputRef}
+      type="file"
+      accept={accept}
+      onChange={handleFileSelect}
+      disabled={disabled || uploading}
+      className="hidden"
+    />
 
-      {currentUrl ? (
-        <div className="relative">
-          <div className="w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
-            <img
-              src={getImageUrl(currentUrl)}
-              alt="Uploaded file"
-              className="w-full h-full object-cover"
-            />
+    {currentUrl ? (
+      <div className="relative">
+        <div className="w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
+          <img
+            src={getImageUrl(currentUrl)}
+            alt="Uploaded file"
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {!disabled && (
+          <button
+            type="button"
+            onClick={handleRemove}
+            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+          >
+            <XMarkIcon className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    ) : (
+      <div
+        onClick={handleClick}
+        className={`w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+      >
+        {uploading ? (
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p className="mt-2 text-sm text-gray-500">Subiendo...</p>
           </div>
+        ) : (
+          <div className="flex flex-col items-center">
+            <CloudArrowUpIcon className="w-8 h-8 text-gray-400" />
+            <p className="mt-2 text-sm text-gray-500">
+              Haz clic para subir archivo
+            </p>
+            <p className="text-xs text-gray-400">
+              Máximo {maxSize}MB
+            </p>
+          </div>
+        )}
+      </div>
+    )}
 
-          {!disabled && (
-            <button
-              type="button"
-              onClick={handleRemove}
-              className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-            >
-              <XMarkIcon className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      ) : (
-        <div
-          onClick={handleClick}
-          className={`w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-        >
-          {uploading ? (
-            <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-sm text-gray-500">Subiendo...</p>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center">
-              <CloudArrowUpIcon className="w-8 h-8 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-500">
-                Haz clic para subir archivo
-              </p>
-              <p className="text-xs text-gray-400">
-                Máximo {maxSize}MB
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {error && (
-        <p className="text-sm text-red-600">{error}</p>
-      )}
-    </div>
-  );
+    {error && (
+      <p className="text-sm text-red-600">{error}</p>
+    )}
+  </div>
+);
 }
