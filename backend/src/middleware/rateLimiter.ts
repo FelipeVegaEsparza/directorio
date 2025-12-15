@@ -19,32 +19,10 @@ export const authLimiter = rateLimit({
   max: 5, // limit each IP to 5 requests per windowMs
   message: {
     error: 'Too many authentication attempts',
-    message: 'Too many login attempts from this IP, please try again later.',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-// Rate limiter for file uploads
-export const uploadLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // limit each IP to 10 uploads per hour
-  message: {
-    error: 'Too many uploads',
-    message: 'Too many file uploads from this IP, please try again later.',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-// Rate limiter for join requests
-export const joinRequestLimiter = rateLimit({
-  windowMs: 24 * 60 * 60 * 1000, // 24 hours
-  max: 3, // limit each IP to 3 join requests per day
-  message: {
-    error: 'Too many join requests',
-    message: 'Too many join requests from this IP, please try again tomorrow.',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+    message: {
+      error: 'Too many join requests',
+      message: 'Too many join requests from this IP, please try again tomorrow.',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
