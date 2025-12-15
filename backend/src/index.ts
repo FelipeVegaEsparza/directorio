@@ -12,6 +12,51 @@ import { errorHandler } from './middleware/errorHandler';
 // Load environment variables
 dotenv.config();
 
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+// Trust proxy for Easypanel/Docker
+app.set('trust proxy', 1);
+
+// Middleware
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+// Debug Middleware for CORS
+app.use((req, res, next) => {
+  console.log('🔍 Request Origin:', req.headers.origin);
+  console.log('⚙️  Configured Frontend URL:', process.env.FRONTEND_URL);
+  next();
+});
+
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    // Allow if origin matches FRONTEND_URL
+    if (origin === allowedOrigin) return callback(null, true);
+
+    // Allow if origin matches the Easypanel domain pattern (for easier deployment)
+    if (origin.endsWith('.easypanel.host')) return callback(null, true);
+
+    // Allow localhost in development
+    if (process.env.NODE_ENV === 'development' && origin.includes('localhost')) return callback(null, true);
+
+    console.warn(`⚠️  Blocked by CORS: ${origin}`);
+    return callback(new Error('Not allowed by CORS'), false);
+  },
+  credentials: true
+}));
+
+app.use(morgan('combined'));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Static files for uploads with CORS headers
 app.use('/uploads', (req: express.Request, res: express.Response, next: express.NextFunction) => {
   res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:3000');
   res.header('Access-Control-Allow-Methods', 'GET');
