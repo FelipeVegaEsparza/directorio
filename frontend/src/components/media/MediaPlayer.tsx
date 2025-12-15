@@ -13,6 +13,7 @@ import { PlayerProps, PlayerState } from '@/types';
 import { Card, Button, Loading, CountryFlag } from '@/components/ui';
 import { apiClient } from '@/lib/api';
 import Hls from 'hls.js';
+import { getImageUrl } from '@/utils/imageUrl';
 
 // Extend PlayerProps locally to avoid modifying global types if not needed immediately
 interface ExtendedPlayerProps extends PlayerProps {
@@ -361,7 +362,7 @@ const MediaPlayer: React.FC<ExtendedPlayerProps> = ({
         <div className="flex items-center space-x-4">
           {media.logoUrl && (
             <img
-              src={media.logoUrl}
+              src={getImageUrl(media.logoUrl)}
               alt={media.name}
               className="w-16 h-16 rounded-xl object-cover"
             />

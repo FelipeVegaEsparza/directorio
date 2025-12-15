@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { 
-  EyeIcon, 
-  PlayIcon, 
+import {
+  EyeIcon,
+  PlayIcon,
   CheckBadgeIcon,
   MapPinIcon,
   TagIcon,
@@ -14,6 +14,7 @@ import {
 import { cn, formatNumber, formatDate } from '@/utils';
 import { Media } from '@/types';
 import { Card, Badge, CountryFlag } from '@/components/ui';
+import { getImageUrl } from '@/utils/imageUrl';
 
 interface MediaInfoProps {
   media: Media;
@@ -42,7 +43,7 @@ const MediaInfo: React.FC<MediaInfoProps> = ({
                   <CheckBadgeIcon className="w-6 h-6 text-success-500" title="Verificado" />
                 )}
               </div>
-              
+
               <div className="space-y-3">
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-2">
@@ -80,7 +81,7 @@ const MediaInfo: React.FC<MediaInfoProps> = ({
                   {media.category && (
                     <div className="flex items-center space-x-1">
                       <TagIcon className="w-4 h-4 flex-shrink-0" />
-                      <Link 
+                      <Link
                         href={`/categoria/${media.category.slug}`}
                         className="hover:text-primary-600 transition-colors truncate"
                       >
@@ -96,7 +97,7 @@ const MediaInfo: React.FC<MediaInfoProps> = ({
             {media.logoUrl && (
               <div className="flex-shrink-0 ml-4">
                 <img
-                  src={media.logoUrl}
+                  src={getImageUrl(media.logoUrl)}
                   alt={media.name}
                   className="w-20 h-20 rounded-xl object-cover shadow-soft"
                 />
