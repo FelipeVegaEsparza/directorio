@@ -2,15 +2,16 @@ import React from 'react';
 import { Media } from '@/types';
 import Button from '@/components/ui/Button';
 import { CountryFlag } from '@/components/ui';
-import { 
-  PencilIcon, 
-  TrashIcon, 
-  EyeIcon, 
+import {
+  PencilIcon,
+  TrashIcon,
+  EyeIcon,
   EyeSlashIcon,
   StarIcon,
   CheckBadgeIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid, CheckBadgeIcon as CheckBadgeIconSolid } from '@heroicons/react/24/solid';
+import { getImageUrl } from '@/utils/imageUrl';
 
 interface MediaListProps {
   media: Media[];
@@ -110,7 +111,7 @@ export function MediaList({
                     <div className="flex-shrink-0 h-12 w-12">
                       {item.logoUrl ? (
                         <img
-                          src={item.logoUrl}
+                          src={getImageUrl(item.logoUrl)}
                           alt={item.name}
                           className="h-12 w-12 rounded-lg object-cover"
                         />
@@ -138,52 +139,49 @@ export function MediaList({
                     </div>
                   </div>
                 </td>
-                
+
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    item.type === 'radio' 
-                      ? 'bg-blue-100 text-blue-800' 
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.type === 'radio'
+                      ? 'bg-blue-100 text-blue-800'
                       : 'bg-purple-100 text-purple-800'
-                  }`}>
+                    }`}>
                     {item.type === 'radio' ? 'Radio' : 'TV'}
                   </span>
                 </td>
-                
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <div className="flex items-center space-x-2">
                     {item.country && <CountryFlag country={item.country} size="sm" />}
                     <span>
-                      {item.city && item.country ? `${item.city}, ${item.country}` : 
-                       item.country || item.city || 'No especificado'}
+                      {item.city && item.country ? `${item.city}, ${item.country}` :
+                        item.country || item.city || 'No especificado'}
                     </span>
                   </div>
                 </td>
-                
+
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    item.isActive 
-                      ? 'bg-green-100 text-green-800' 
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.isActive
+                      ? 'bg-green-100 text-green-800'
                       : 'bg-red-100 text-red-800'
-                  }`}>
+                    }`}>
                     {item.isActive ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
-                
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div className="space-y-1">
                     <div>Vistas: {item.viewCount.toLocaleString()}</div>
                     <div>Reproducciones: {item.playCount.toLocaleString()}</div>
                   </div>
                 </td>
-                
+
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex items-center justify-end space-x-2">
                     {/* Toggle Status */}
                     <button
                       onClick={() => onToggleStatus(item.id)}
-                      className={`p-1 rounded-md hover:bg-gray-100 ${
-                        item.isActive ? 'text-green-600' : 'text-red-600'
-                      }`}
+                      className={`p-1 rounded-md hover:bg-gray-100 ${item.isActive ? 'text-green-600' : 'text-red-600'
+                        }`}
                       title={item.isActive ? 'Desactivar' : 'Activar'}
                     >
                       {item.isActive ? (
@@ -192,13 +190,12 @@ export function MediaList({
                         <EyeSlashIcon className="w-4 h-4" />
                       )}
                     </button>
-                    
+
                     {/* Toggle Featured */}
                     <button
                       onClick={() => onToggleFeatured(item.id)}
-                      className={`p-1 rounded-md hover:bg-gray-100 ${
-                        item.isFeatured ? 'text-yellow-500' : 'text-gray-400'
-                      }`}
+                      className={`p-1 rounded-md hover:bg-gray-100 ${item.isFeatured ? 'text-yellow-500' : 'text-gray-400'
+                        }`}
                       title={item.isFeatured ? 'Quitar destacado' : 'Marcar como destacado'}
                     >
                       {item.isFeatured ? (
@@ -207,13 +204,12 @@ export function MediaList({
                         <StarIcon className="w-4 h-4" />
                       )}
                     </button>
-                    
+
                     {/* Toggle Verified */}
                     <button
                       onClick={() => onToggleVerified(item.id)}
-                      className={`p-1 rounded-md hover:bg-gray-100 ${
-                        item.isVerified ? 'text-blue-500' : 'text-gray-400'
-                      }`}
+                      className={`p-1 rounded-md hover:bg-gray-100 ${item.isVerified ? 'text-blue-500' : 'text-gray-400'
+                        }`}
                       title={item.isVerified ? 'Quitar verificación' : 'Marcar como verificado'}
                     >
                       {item.isVerified ? (
@@ -222,7 +218,7 @@ export function MediaList({
                         <CheckBadgeIcon className="w-4 h-4" />
                       )}
                     </button>
-                    
+
                     {/* Edit */}
                     <button
                       onClick={() => onEdit(item)}
@@ -231,7 +227,7 @@ export function MediaList({
                     >
                       <PencilIcon className="w-4 h-4" />
                     </button>
-                    
+
                     {/* Delete */}
                     <button
                       onClick={() => onDelete(item.id)}
@@ -269,7 +265,7 @@ export function MediaList({
               Siguiente
             </Button>
           </div>
-          
+
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-700">
@@ -286,7 +282,7 @@ export function MediaList({
                 resultados
               </p>
             </div>
-            
+
             <div>
               <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                 <Button
@@ -298,7 +294,7 @@ export function MediaList({
                 >
                   Anterior
                 </Button>
-                
+
                 {/* Page numbers */}
                 {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                   const pageNum = i + 1;
@@ -314,7 +310,7 @@ export function MediaList({
                     </Button>
                   );
                 })}
-                
+
                 <Button
                   onClick={() => onPageChange(pagination.page + 1)}
                   disabled={pagination.page >= pagination.totalPages}

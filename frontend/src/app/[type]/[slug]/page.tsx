@@ -9,6 +9,7 @@ import { Button, Loading, NoSSR } from '@/components/ui';
 import IpstreamCTA from '@/components/IpstreamCTA';
 import { useMediaDetail } from '@/hooks/useMediaDetail';
 import { useMedia } from '@/hooks/useMedia';
+import { getImageUrl } from '@/utils/imageUrl';
 
 export default function MediaDetailPage() {
   const params = useParams();
@@ -177,7 +178,7 @@ export default function MediaDetailPage() {
                         <div className="w-full h-full rounded-full shadow-2xl overflow-hidden border-4 border-white bg-white relative z-10">
                           {media.logoUrl || media.bannerUrl ? (
                             <img
-                              src={media.logoUrl || media.bannerUrl}
+                              src={getImageUrl(media.logoUrl || media.bannerUrl)}
                               alt={media.name}
                               className="w-full h-full object-cover"
                             />
@@ -274,7 +275,7 @@ export default function MediaDetailPage() {
                         {/* Preview Image */}
                         {media.bannerUrl || media.logoUrl ? (
                           <img
-                            src={media.bannerUrl || media.logoUrl}
+                            src={getImageUrl(media.bannerUrl || media.logoUrl)}
                             alt={media.name}
                             className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-500"
                           />
