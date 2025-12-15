@@ -31,6 +31,23 @@ const MediaCard: React.FC<MediaCardProps> = ({
     }
   };
 
+  const getImageUrl = (url?: string) => {
+    if (!url) return undefined;
+
+    // Fix for legacy localhost URLs
+    if (url.includes('localhost:3001')) {
+      const relativePath = url.split('localhost:3001')[1];
+      return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${relativePath}`;
+    }
+
+    // Handle relative paths
+    if (url.startsWith('/')) {
+      return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${url}`;
+    }
+
+    return url;
+  };
+
   const handleOpenClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -60,7 +77,7 @@ const MediaCard: React.FC<MediaCardProps> = ({
             <div className="relative z-20 flex items-center justify-center w-full h-full">
               {media.logoUrl || media.bannerUrl ? (
                 <img
-                  src={media.logoUrl || media.bannerUrl}
+                  src={getImageUrl(media.logoUrl || media.bannerUrl)}
                   alt={media.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />

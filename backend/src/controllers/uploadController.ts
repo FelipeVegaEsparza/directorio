@@ -39,9 +39,8 @@ export const uploadFile = asyncHandler(async (req: Request, res: Response) => {
     throw new BadRequestError('No file uploaded');
   }
 
-  // Create absolute URL for the uploaded file
-  const baseUrl = process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 3001}`;
-  const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
+  // Save relative path for flexibility
+  const fileUrl = `/uploads/${req.file.filename}`;
 
   // File uploaded successfully
 
@@ -61,19 +60,17 @@ export const uploadFile = asyncHandler(async (req: Request, res: Response) => {
 // Upload multiple files
 export const uploadFiles = asyncHandler(async (req: Request, res: Response) => {
   const files = req.files as Express.Multer.File[];
-  
+
   if (!files || files.length === 0) {
     throw new BadRequestError('No files uploaded');
   }
 
-  const baseUrl = process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 3001}`;
-  
   const uploadedFiles = files.map(file => ({
     filename: file.filename,
     originalName: file.originalname,
     size: file.size,
     mimetype: file.mimetype,
-    url: `${baseUrl}/uploads/${file.filename}`,
+    url: `/uploads/${file.filename}`,
   }));
 
   res.json({
