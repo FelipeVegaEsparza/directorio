@@ -6,6 +6,11 @@ import { SiteConfigProvider } from "@/components/SiteConfigProvider";
 export const metadata: Metadata = {
   title: "Hostreams - Directorio de Radio y TV",
   description: "Descubre y disfruta de las mejores radios y canales de televisión en vivo",
+  icons: {
+    icon: '/images/favicon.png',
+    shortcut: '/images/favicon.png',
+    apple: '/images/favicon.png',
+  },
 };
 
 export default function RootLayout({
