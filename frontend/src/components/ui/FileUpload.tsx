@@ -12,12 +12,12 @@ interface FileUploadProps {
   maxSize?: number; // in MB
 }
 
-export function FileUpload({ 
-  onUpload, 
-  accept = 'image/*', 
-  currentUrl, 
+export function FileUpload({
+  onUpload,
+  accept = 'image/*',
+  currentUrl,
   disabled = false,
-  maxSize = 5 
+  maxSize = 5
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export function FileUpload({
       if (response.success) {
         // Try different possible response structures
         const url = response.data?.data?.url || response.data?.url || response.url;
-        
+
         if (url) {
           onUpload(url);
         } else {
@@ -66,7 +66,7 @@ export function FileUpload({
       }
     } catch (err: any) {
       let errorMessage = 'Error al subir archivo';
-      
+
       if (err.response) {
         if (err.response.status === 404) {
           errorMessage = 'Endpoint de upload no encontrado. Verifica que el backend esté ejecutándose.';
@@ -82,7 +82,7 @@ export function FileUpload({
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       setError(errorMessage);
     } finally {
       setUploading(false);
@@ -95,72 +95,44 @@ export function FileUpload({
 
   const handleRemove = () => {
     onUpload('');
-  };
-
-  const handleClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  return (
-    <div className="space-y-2">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={accept}
-        onChange={handleFileSelect}
-        disabled={disabled || uploading}
-        className="hidden"
-      />
-
-      {currentUrl ? (
-        <div className="relative">
-          <div className="w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
-            <img
-              src={currentUrl}
-              alt="Uploaded file"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
-          {!disabled && (
-            <button
-              type="button"
-              onClick={handleRemove}
-              className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-            >
-              <XMarkIcon className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+    onClick = { handleRemove }
+    className = "absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+      >
+      <XMarkIcon className="w-4 h-4" />
+            </button >
+          )
+}
+        </div >
       ) : (
-        <div
-          onClick={handleClick}
-          className={`w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 transition-colors ${
-            disabled ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-        >
-          {uploading ? (
-            <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-sm text-gray-500">Subiendo...</p>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center">
-              <CloudArrowUpIcon className="w-8 h-8 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-500">
-                Haz clic para subir archivo
-              </p>
-              <p className="text-xs text-gray-400">
-                Máximo {maxSize}MB
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+  <div
+    onClick={handleClick}
+    className={`w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : ''
+      }`}
+  >
+    {uploading ? (
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <p className="mt-2 text-sm text-gray-500">Subiendo...</p>
+      </div>
+    ) : (
+      <div className="flex flex-col items-center">
+        <CloudArrowUpIcon className="w-8 h-8 text-gray-400" />
+        <p className="mt-2 text-sm text-gray-500">
+          Haz clic para subir archivo
+        </p>
+        <p className="text-xs text-gray-400">
+          Máximo {maxSize}MB
+        </p>
+      </div>
+    )}
+  </div>
+)}
 
-      {error && (
-        <p className="text-sm text-red-600">{error}</p>
-      )}
-    </div>
+{
+  error && (
+    <p className="text-sm text-red-600">{error}</p>
+  )
+}
+    </div >
   );
 }
